@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Document</title>
+</head>
+
+<body>
+
+    <h1>Vamos a localizarte</h1>
+    <button onclick="localizar()">Localizar</button>
+    <div id="salida"></div>
+    <!--<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>-->
+    <!--<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>-->
+    <script src="http://code.jquery.com/jquery-2.2.4.min.js"></script>
+    <script>
+        var x = document.getElementById('salida');
+
+        function localizar() {
+            if (navigator.geolocation) {
+
+                navigator.geolocation.getCurrentPosition(mostrarPosicion, mostrarError);
+
+            } else {
+                x.innerHTML = "no se puede soportar esta API";
+
+            }
+        }
+
+        function mostrarPosicion(posicion) {
+            //x.innerHTML = "LATITUD: " + posicion.coords.latitude; // 19.390304500000003
+            //x.innerHTML += "<br/>";
+            //x.innerHTML += "LONGITUD: " + posicion.coords.longitude // -99.1186539
+
+            var localAPI = "http://maps.googleapis.com/maps/api/geocode/json?latlng=" +
+                posicion.coords.latitude + " , " + posicion.coords.longitude + "&sensor=true";
+
+            //x.innerHTML = localAPI;
+
+            $.get({
+                url: localAPI,
+                success: function(datos) {
+                    console.log(datos);
+                    x.innerHTML = datos.results[0].address_components[0].long_name + ", ";
+                    x.innerHTML = datos.results[0].address_components[1].long_name;
+                    x.innerHTML = datos.results[0].address_components[2].long_name;
+
+                }
+            });
+        }
+
+        function mostrarError(error) {
+            switch (error.code) {
+                case error.PERMISSION_DENIED:
+                    x.innerHTML = "codigo: "+error.code+ "no se quiere compartir ubicacion";
+                    break;
+                case error.POSITION_UNAVAILABLE:
+                    x.innerHTML = "codigo: "+error.code+"no está la ubicacion disponible";
+                    break;
+                case error.TIMEOUT:
+                    x.innerHTML = "codigo: "+error.code+"tiempo terminado";
+                    break;
+                case error.UNKNOWN_ERROR:
+                    x.innerHTML = "codigo: "+error.code+"algo extraño pasó";
+                    break;
+
+            }
+
+        }
+
+    </script>
+</body>
+
+</html>
